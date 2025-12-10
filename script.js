@@ -5,4 +5,40 @@ window.addEventListener('load', function() {
 
   canvas.width = 1500;
   canvas.height = 500;
+
+  class InputHandler {
+
+  }
+
+  class Projectile {
+
+  }
+
+  class Particle {
+
+  }
+
+  class Player {
+
+  }
+
+  class Enemy {
+
+  }
+
+  class Layer {
+
+  }
+
+  class Background {
+
+  }
+
+  class UI {
+
+  }
+
+  class Game {
+    
+  }
 })
