@@ -10,14 +10,18 @@ window.addEventListener('load', function () {
     constructor(game) {
       this.game = game;
       window.addEventListener('keydown', event => {
-        const pressedKeys =
+        const movementActionKeys =
           event.key === 'ArrowUp' ||
           event.key === 'ArrowDown';
 
+        const shootActionKey = event.key === ' ';
+
         const isNotInTheArray = this.game.keys.indexOf(event.key) === -1
 
-        if (pressedKeys && isNotInTheArray) {
+        if (movementActionKeys && isNotInTheArray) {
           this.game.keys.push(event.key)
+        } else if (shootActionKey) {
+          this.game.player.shootTop()
         }
       })
 
@@ -30,7 +34,27 @@ window.addEventListener('load', function () {
   }
 
   class Projectile {
+    constructor(game, x, y) {
+      this.game = game;
+      this.x = x;
+      this.y = y;
+      this.width = 10;
+      this.height = 3;
+      this.speed = 3;
+      this.markedForDeletion = false;
+    }
 
+    update() {
+      this.x += this.speed;
+
+      const isXCoord80pctGameWidth = this.x > this.game.width * 0.8
+      if (isXCoord80pctGameWidth) this.markedForDeletion = true;
+    }
+
+    draw(context) {
+      context.fillStyle = 'yellow';
+      context.fillRect(this.x, this.y, this.width, this.height);
+    }
   }
 
   class Particle {
@@ -46,6 +70,7 @@ window.addEventListener('load', function () {
       this.y = 100;
       this.speedY = 0;
       this.maxSpeed = 3;
+      this.projectiles = [];
     }
 
     update() {
@@ -57,10 +82,30 @@ window.addEventListener('load', function () {
       else this.speedY = 0;
 
       this.y += this.speedY;
+
+      // handle projectiles
+      this.projectiles.forEach(projectile => {
+        projectile.update()
+      })
+
+      this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion);
     }
 
     draw(context) {
+      context.fillStyle = 'black';
       context.fillRect(this.x, this.y, this.width, this.height);
+      this.projectiles.forEach(projectile => {
+        projectile.draw(context)
+      })
+    }
+
+    shootTop() {
+      const hasAmmo = this.game.ammo > 0
+
+      if (hasAmmo) {
+        this.projectiles.push(new Projectile(this.game, this.x + 80, this.y + 30));
+        this.game.ammo--;
+      }
     }
   }
 
@@ -87,6 +132,7 @@ window.addEventListener('load', function () {
       this.player = new Player(this);
       this.input = new InputHandler(this)
       this.keys = [];
+      this.ammo = 20;
     }
 
     update() {
