@@ -7,7 +7,26 @@ window.addEventListener('load', function () {
   canvas.height = 500;
 
   class InputHandler {
+    constructor(game) {
+      this.game = game;
+      window.addEventListener('keydown', event => {
+        const pressedKeys =
+          event.key === 'ArrowUp' ||
+          event.key === 'ArrowDown';
 
+        const isNotInTheArray = this.game.keys.indexOf(event.key) === -1
+
+        if (pressedKeys && isNotInTheArray) {
+          this.game.keys.push(event.key)
+        }
+      })
+
+      window.addEventListener('keyup', event => {
+        if (this.game.keys.indexOf(event.key) > -1) {
+          this.game.keys.splice(this.game.keys.indexOf(event.key), 1);
+        }
+      })
+    }
   }
 
   class Projectile {
@@ -26,9 +45,17 @@ window.addEventListener('load', function () {
       this.x = 20;
       this.y = 100;
       this.speedY = 0;
+      this.maxSpeed = 3;
     }
 
     update() {
+      const goUp = this.game.keys.includes('ArrowUp');
+      const goDown = this.game.keys.includes('ArrowDown');
+
+      if (goUp) this.speedY = -this.maxSpeed;
+      else if (goDown) this.speedY = this.maxSpeed;
+      else this.speedY = 0;
+
       this.y += this.speedY;
     }
 
@@ -58,6 +85,8 @@ window.addEventListener('load', function () {
       this.width = width;
       this.height = height;
       this.player = new Player(this);
+      this.input = new InputHandler(this)
+      this.keys = [];
     }
 
     update() {
