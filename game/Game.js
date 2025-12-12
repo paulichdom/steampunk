@@ -1,5 +1,6 @@
 import { Player } from "./entities/Player.js";
 import { InputHandler } from "./entities/InputHandler.js";
+import { UI } from "./entities/UI.js";
 
 export class Game {
   constructor(width, height) {
@@ -7,6 +8,7 @@ export class Game {
     this.height = height;
     this.player = new Player(this);
     this.input = new InputHandler(this)
+    this.ui = new UI(this)
     this.keys = [];
     this.ammo = 20;
     this.maxAmmo = 50;
@@ -27,5 +29,6 @@ export class Game {
 
   draw(context) {
     this.player.draw(context);
+    this.ui.draw(context);
   }
 }
