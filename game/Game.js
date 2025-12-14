@@ -33,9 +33,24 @@ export class Game {
 
     this.enemies.forEach(enemy => {
       enemy.update();
+
+      if (this.checkCollision(this.player, enemy)) {
+        enemy.markedForDeletion = true;
+      }
+
+      this.player.projectiles.forEach(projectile => {
+        if (this.checkCollision(projectile, enemy)) {
+          enemy.lives--;
+          projectile.markedForDeletion = true;
+          if (enemy.lives <= 0) {
+            enemy.markedForDeletion = true;
+            this.score += enemy.score;
+          }
+        }
+      })
     })
 
-    this.enemies.filter(enemy => !enemy.markedForDeletion);
+    this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
     const shouldAddEnemy = (this.enemyTimer > this.enemyInterval) && !this.gameOver;
 
     if (shouldAddEnemy) {
@@ -56,5 +71,19 @@ export class Game {
 
   addEnemy() {
     this.enemies.push(new Angler1(this));
+  }
+
+  checkCollision(rect1, rect2) {
+    const isRect1LeftOfRect2Right = rect1.x < rect2.x + rect2.width;
+    const isRect1RightOfRect2Left = rect1.x + rect1.width > rect2.x;
+    const isRect1TopOfRect2Bottom = rect1.y < rect2.y + rect2.height;
+    const isRect1BottomOfRect2Top = rect1.y + rect1.height > rect2.y;
+
+    return (
+      isRect1LeftOfRect2Right &&
+      isRect1RightOfRect2Left &&
+      isRect1TopOfRect2Bottom &&
+      isRect1BottomOfRect2Top
+    );
   }
 }
