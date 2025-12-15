@@ -19,6 +19,8 @@ export class Game {
     this.ammoTimer = 0;
     this.ammoInterval = 500;
     this.gameOver = false;
+    this.score = 0;
+    this.winningScore = 10;
   }
 
   update(deltaTime) {
@@ -42,9 +44,12 @@ export class Game {
         if (this.checkCollision(projectile, enemy)) {
           enemy.lives--;
           projectile.markedForDeletion = true;
+
           if (enemy.lives <= 0) {
             enemy.markedForDeletion = true;
             this.score += enemy.score;
+
+            if (this.score > this.winningScore) this.gameOver = true;
           }
         }
       })
